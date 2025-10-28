@@ -137,6 +137,20 @@ On startup, I can now choose between **Windows 11** and **Ubuntu** directly from
 | **Oct 28 (late)**         | Successful dual-boot test       | —                                                                   | 🟢 Ubuntu now selectable at startup                      | Laptop now boots both Windows 11 and Ubuntu from internal menu.           |
 | **Oct 28 (post-success)** | Documentation and GitHub update | `git add . && git commit && git push`                               | 📘 Repository updated                                    | Full log, architecture diagram, and repair timeline committed.            |
 
+timeline
+    title Ubuntu Boot Repair — October 2025
+    section Day 1 — Initial Issues
+      Windows Boot Error : "shimx64.efi missing or corrupt"
+      Checked BCD entries : Found duplicate Ubuntu GUIDs
+      Attempted bcdedit fix : Element not found
+    section Day 2 — Recovery Attempts
+      Booted Ubuntu Live USB : Mounted /dev/sda3 and /dev/sda2
+      Reinstalled GRUB : Encountered /cow and modinfo.sh errors
+      Verified UEFI entries : efibootmgr showed Ubuntu correctly
+    section Day 2 — Final Fix
+      Cleaned BCD and Firmware entries : Removed old GUIDs
+      GRUB detected correctly : Ubuntu boots from SSD
+      Success : Dual-boot menu (Windows / Linux) working 🎉
 
 ### 🧠 Lessons Learned
 - Windows Boot Manager and GRUB both store entries in the EFI System Partition — careful partition targeting is crucial.
