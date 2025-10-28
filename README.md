@@ -123,6 +123,21 @@ On startup, I can now choose between **Windows 11** and **Ubuntu** directly from
 - Updated Windows Boot Manager order and confirmed the Ubuntu entry is recognised.
 - Verified both operating systems load independently and without external media.
 
+| Date                      | Step                            | Tools / Commands Used                                               | Outcome                                                  | Notes                                                                     |
+| ------------------------- | ------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Oct 27**                | Initial failure                 | —                                                                   | ❌ Boot loop / missing OS entries                         | Windows Boot Manager detected Ubuntu EFI but couldn’t load `shimx64.efi`. |
+| **Oct 27**                | Checked BCD entries             | `bcdedit /enum firmware`                                            | ⚙️ Found multiple orphaned Ubuntu GUIDs                  | Two duplicate `{ubuntu}` entries and one external EFI reference.          |
+| **Oct 27**                | Attempted EFI repair            | `bcdedit /set {GUID} firmwaretype UEFI`                             | ⚠️ Failed with "Element not found"                       | Indicated invalid or missing entry.                                       |
+| **Oct 28 (morning)**      | Booted via Ubuntu USB           | —                                                                   | ✅ Accessed live environment                              | Began manual GRUB repair from live session.                               |
+| **Oct 28 (morning)**      | Mounted partitions              | `sudo mount /dev/sda3 /mnt`<br>`sudo mount /dev/sda2 /mnt/boot/efi` | ✅ Mounted external SSD’s Ubuntu root and EFI partitions. |                                                                           |
+| **Oct 28 (afternoon)**    | GRUB reinstall attempt 1        | `grub-install ... --efi-directory=/mnt/boot/efi`                    | ❌ Error: "failed to get canonical path of /cow"          | Caused by running outside `chroot` environment.                           |
+| **Oct 28 (afternoon)**    | GRUB reinstall attempt 2        | `sudo chroot /mnt` → `grub-install ...`                             | ⚠️ Error: "modinfo.sh doesn’t exist"                     | Missing package or wrong directory mount.                                 |
+| **Oct 28 (evening)**      | Verified UEFI entries           | `sudo efibootmgr`                                                   | ✅ Ubuntu detected in firmware boot list                  | EFI entry appeared with correct path `/EFI/ubuntu/shimx64.efi`.           |
+| **Oct 28 (evening)**      | Cleaned up boot entries         | `bcdedit /delete {GUID}` (old entries)                              | ✅ Simplified Windows Boot Menu                           | Removed dead Ubuntu entries from BCD store.                               |
+| **Oct 28 (late)**         | Successful dual-boot test       | —                                                                   | 🟢 Ubuntu now selectable at startup                      | Laptop now boots both Windows 11 and Ubuntu from internal menu.           |
+| **Oct 28 (post-success)** | Documentation and GitHub update | `git add . && git commit && git push`                               | 📘 Repository updated                                    | Full log, architecture diagram, and repair timeline committed.            |
+
+
 ### 🧠 Lessons Learned
 - Windows Boot Manager and GRUB both store entries in the EFI System Partition — careful partition targeting is crucial.
 - Always mount the EFI partition correctly before reinstalling GRUB.
