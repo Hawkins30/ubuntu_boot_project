@@ -112,6 +112,33 @@ graph TD
 | ⚙️ **Firmware / Boot Manager** | `UEFI` | — | BIOS Settings | Boot order and entries (Windows + Ubuntu External) | ⚙️ Under Review |
 
 ---
+## 🧩 Dual-Boot Success — October 28, 2025
+
+After extensive troubleshooting, Ubuntu now successfully dual-boots from the external SSD via the laptop’s UEFI boot manager.  
+On startup, I can now choose between **Windows 11** and **Ubuntu** directly from the **internal boot menu**, without needing the USB installer.
+
+### ✅ What Changed
+- Repaired GRUB and reinstalled the EFI entry correctly to `/dev/sda2`.
+- Cleaned up broken UEFI boot entries using `efibootmgr`.
+- Updated Windows Boot Manager order and confirmed the Ubuntu entry is recognised.
+- Verified both operating systems load independently and without external media.
+
+### 🧠 Lessons Learned
+- Windows Boot Manager and GRUB both store entries in the EFI System Partition — careful partition targeting is crucial.
+- Always mount the EFI partition correctly before reinstalling GRUB.
+- UEFI firmware may cache bad entries even after removal — check with `bcdedit` and `efibootmgr`.
+- Dual-booting works cleanest when both systems use the same firmware mode (UEFI).
+
+### 🖼️ Current Boot Flow (Simplified)
+
+```mermaid
+graph TD
+    BIOS["UEFI Firmware"]
+    BIOS --> WBM["Windows Boot Manager"]
+    BIOS --> GRUB["Ubuntu GRUB Loader"]
+    WBM --> WIN["Windows 11"]
+    GRUB --> UBU["Ubuntu (External SSD)"]
+```
 
 ### 🔍 Notes
 - EFI entries have been reconfigured multiple times using `bcdedit` and `efibootmgr`.
