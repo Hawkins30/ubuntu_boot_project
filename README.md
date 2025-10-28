@@ -156,6 +156,15 @@ timeline
       Success : Dual-boot menu (Windows / Linux) working 🎉
 ```
 
+### ✅ Final Update — October 29, 2025
+
+- Verified successful dual-boot from BIOS boot menu and Windows Boot Manager.
+- Both **Windows 11** and **Ubuntu External (SSD)** boot independently without errors.
+- Confirmed GRUB entries and GUIDs now correctly aligned with EFI partitions.
+- Documented full repair process and configuration in GitHub for reference.
+- System now stable and reproducible for future maintenance.
+
+
 ### 🧠 Lessons Learned
 - Windows Boot Manager and GRUB both store entries in the EFI System Partition — careful partition targeting is crucial.
 - Always mount the EFI partition correctly before reinstalling GRUB.
