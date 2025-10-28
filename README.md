@@ -73,17 +73,18 @@ Developed and documented by **Alex Hawkins**
 ```mermaid
 graph TD
     subgraph Laptop_Internal["💻 Laptop (Internal Drive)"]
-        W11[Windows 11]
-        EFI1[EFI Partition (Windows Boot Manager)]
+        W11["Windows 11"]
+        EFI1["EFI Partition (Windows Boot Manager)"]
     end
 
     subgraph External_SSD["🧩 External SSD (Seagate Game Drive PS4)"]
-        UB[Ubuntu Root (/dev/sda3)]
-        EFI2[EFI Partition (/dev/sda2)]
+        UB["Ubuntu Root (/dev/sda3)"]
+        EFI2["EFI Partition (/dev/sda2)"]
     end
 
-    BIOS[UEFI Firmware]
+    BIOS["UEFI Firmware"]
     BIOS --> EFI1
     BIOS --> EFI2
     EFI1 --> W11
     EFI2 --> UB
+
