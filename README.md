@@ -1,5 +1,16 @@
 # 🧩 Ubuntu External Boot Recovery Project
 
+## 🧰 Tech Stack
+
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+![Windows 11](https://img.shields.io/badge/Windows%2011-0078D6?style=for-the-badge&logo=windows11&logoColor=white)
+![GRUB](https://img.shields.io/badge/GRUB-241F31?style=for-the-badge&logo=gnu-grub&logoColor=white)
+![UEFI](https://img.shields.io/badge/UEFI-2C3E50?style=for-the-badge&logo=gnome-terminal&logoColor=white)
+![Bash](https://img.shields.io/badge/Bash-121011?style=for-the-badge&logo=gnu-bash&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05033?style=for-the-badge&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
+![WSL](https://img.shields.io/badge/WSL-0078D7?style=for-the-badge&logo=windows-terminal&logoColor=white)
+
 ![GitHub last commit](https://img.shields.io/github/last-commit/Hawkins30/ubuntu_boot_project)
 ![GitHub repo size](https://img.shields.io/github/repo-size/Hawkins30/ubuntu_boot_project)
 ![GitHub issues](https://img.shields.io/github/issues/Hawkins30/ubuntu_boot_project)
