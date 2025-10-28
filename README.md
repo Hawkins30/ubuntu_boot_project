@@ -81,6 +81,8 @@ Developed and documented by **Alex Hawkins**
 
 ## 🖥️ System Boot Architecture (Diagram)
 
+## 🖥️ System Boot Architecture (Diagram)
+
 ```mermaid
 graph TD
     subgraph Laptop_Internal["💻 Laptop (Internal Drive)"]
@@ -98,6 +100,7 @@ graph TD
     BIOS --> EFI2
     EFI1 --> W11
     EFI2 --> UB
+
 
 ## 🧾 System Overview
 
