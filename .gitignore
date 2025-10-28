@@ -1,0 +1,21 @@
+# OS / System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.log
+*.tmp
+*.swp
+
+# Ubuntu system mount points
+/mnt/*
+!/mnt/c
+
+# Python / Script artifacts (if used later)
+__pycache__/
+*.pyc
+
+# VS Code / Editor
+.vscode/
+.idea/
