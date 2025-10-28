@@ -99,3 +99,37 @@ graph TD
     EFI1 --> W11
     EFI2 --> UB
 
+## 🧾 System Overview
+
+| System | Device | Partition | Mount Point | Description | Status |
+|--------|---------|------------|--------------|--------------|---------|
+| 💻 **Internal Laptop Drive** | `/dev/nvme0n1` (example) | `EFI` | `/boot/efi` | Windows Boot Manager | ✅ Working |
+| 💻 **Internal Laptop Drive** | `/dev/nvme0n1p3` | `NTFS` | `C:\` | Windows 11 OS | ✅ Working |
+| 🧩 **External SSD (Seagate Game Drive PS4)** | `/dev/sda2` | `EFI` | `/mnt/boot/efi` | Ubuntu EFI Partition | ⚠️ Repaired |
+| 🧩 **External SSD (Seagate Game Drive PS4)** | `/dev/sda3` | `ext4` | `/mnt` | Ubuntu Root | ⚠️ Boot Issues Persist |
+| ⚙️ **Firmware / Boot Manager** | `UEFI` | — | BIOS Settings | Boot order and entries (Windows + Ubuntu External) | ⚙️ Under Review |
+
+---
+
+### 🔍 Notes
+- EFI entries have been reconfigured multiple times using `bcdedit` and `efibootmgr`.
+- Ubuntu’s GRUB install failed with canonical path errors (`/cow`, `/boot/efi`).
+- Windows Boot Manager still takes priority (`bootmgr` loads fine).
+- Ubuntu boot attempt results in:  
+  `File: \EFI\ubuntu\shimx64.efi — Status: 0xc000007b`
+
+---
+
+### 🧠 Next Steps
+1. Backup current EFI and BCD configurations.  
+2. Attempt GRUB reinstall from chroot with verified `--efi-directory`.  
+3. Validate `efibootmgr` boot order consistency in firmware.  
+4. Create a clean boot entry if repair fails.
+
+---
+
+### 🧩 References
+- [Ubuntu GRUB Manual](https://help.ubuntu.com/community/Grub2)
+- [Microsoft BCDedit Documentation](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/bcdedit-command-line-options)
+- [UEFI Boot Manager Spec](https://uefi.org/specifications)
+
