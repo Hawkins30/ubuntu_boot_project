@@ -196,3 +196,118 @@ bcdedit /set {bootmgr} displaybootmenu yes
 ```
 Goal for Day 3: ensure Ubuntu boots independently from SSD and add to Windows Boot Manager menu.
 
+
+## 🗓️ Day 3 — October 29, 2025
+
+### Objective
+Finalize the dual-boot configuration by cleaning redundant firmware entries, linking Ubuntu’s EFI bootloader correctly, and confirming stable startup for both Windows and Ubuntu.
+
+### Actions
+- Booted into **Windows 11** to inspect firmware-level boot entries.
+- Ran:
+
+```text
+```bash
+bcdedit /enum firmware
+```
+- Output showed duplicate Ubuntu entries refencing the Sseagate SSD:
+
+```text
+identifier              {aad562f3-b409-11f0-9464-806e6f6e6963}
+device                  partition=S:
+description             UEFI: Seagate Game Drive PS4
+
+identifier              {aad562f4-b409-11f0-9464-806e6f6e6963}
+device                  partition=S:
+path                    \EFI\ubuntu\shimx64.efi
+description             Ubuntu
+```
+- Deleted redundant firmware entries:
+
+```text
+bcdedit /delete {aad562f3-b409-11f0-9464-806e6f6e6963}
+bcdedit /delete {aad562f4-b409-11f0-9464-806e6f6e6963}
+```
+- Created a clean Ubuntu boot entry:
+
+```text
+bcdedit /create /d "Ubuntu External" /application BOOTSECTOR
+```
+- Then pointed it to the correct EFI partition and loader:
+
+```text
+bcdedit /set {<new_guid>} device partition=S:
+bcdedit /set {<new_guid>} path \EFI\ubuntu\shimx64.efi
+bcdedit /displayorder {<new_guid>} /addlast
+bcdedit /set {bootmgr} displaybootmenu yes
+bcdedit /timeout 10
+```
+- Rebooted and confirmed Windows Boot Manager displayed:
+
+```text
+Windows 11
+Ubuntu External
+```
+Selected Ubuntu External → GRUB loaded successfully → Ubuntu booted from SSD.
+Confirmed secondary boot path works independently when the external drive is connected.
+
+
+### Observations
+
+GRUB chain-loading is now stable.
+Windows and Ubuntu both launch without errors.
+If the external SSD is unplugged, the system defaults safely to Windows Boot Manager.
+Reboot cycles between operating systems function without any EFI corruption.
+
+### Notes
+
+- Verified BIOS boot priorities — Ubuntu entry appears automatically when SSD is attached.
+
+- Confirmed both EFI partitions are intact and properly recognized:
+
+```text
+sudo efibootmgr
+```
+- Output:
+
+```text
+Boot0000* Windows Boot Manager
+Boot0002* Ubuntu External
+```
+- Ensured GRUB was set as the default loader for the external drive:
+
+```text
+sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Ubuntu
+sudo update-grub
+```
+- Tested boot without USB installer present — both systems loaded independently.
+
+### Outcome
+
+✅ Dual-boot success achieved.
+
+System behavior:
+
+SSD plugged in: Presents menu with Windows 11 and Ubuntu External.
+
+SSD unplugged: Boots directly into Windows without error.
+
+No further GRUB errors, missing EFI paths, or inconsistent firmware entries.
+
+Performance verified over multiple reboots.
+Final configuration confirmed stable and reproducible.
+
+### Reflections
+
+This project demonstrated how UEFI, GRUB, and Windows Boot Manager coexist on separate physical drives.
+By isolating EFI systems, both OSes remain independent yet connected through firmware-level chaining.
+The process clarified advanced boot repair concepts essential for cybersecurity and system recovery.
+
+Final system summary:
+
+```text
+Internal NVMe  →  Windows 11  
+External SSD   →  Ubuntu 22.04  
+Boot Mode      →  UEFI  
+State          →  Fully operational dual-boot
+```
