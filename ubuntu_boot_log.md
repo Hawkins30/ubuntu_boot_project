@@ -5,34 +5,83 @@ This project documents the process of setting up Ubuntu to boot externally from 
 
 ---
 
-## Day 1 — Boot Configuration Attempts (Oct 28, 2025)
+## 🗓️ Day 1 — October 27, 2025
 
-### Objectives
-- Make Ubuntu boot only when the external drive is plugged in.
-- Keep Windows 11 as the default when the drive is not connected.
+### Objective
+Boot Ubuntu externally from an SSD connected via USB, while maintaining the existing Windows 11 installation on the internal drive.  
+Investigation began after the initial external boot attempt failed.
 
-### Steps Taken
-1. Accessed BIOS and disabled Secure Boot.
-2. Verified EFI boot entries using `efibootmgr`.
-3. Mounted partitions in Ubuntu live environment (`/dev/sda2` for EFI, `/dev/sda3` for root).
-4. Attempted multiple GRUB reinstalls and EFI boot manager edits.
-5. Edited Windows Boot Manager using `bcdedit` to detect and launch Ubuntu.
-6. Tested boot behavior across configurations.
+### Actions
+- Booted into BIOS and confirmed both internal and external drives were detected.  
+- Attempted boot from **UEFI: Seagate Game Drive PS4** — failed with:
 
-### Issues Encountered
-- EFI variables not supported when using live USB.
-- GRUB installation failed multiple times due to missing canonical paths.
-- Ubuntu boot entries appeared in Windows Boot Manager but failed to launch.
-- Received repeated “shimx64.efi missing” error during boot attempts.
+```text
+File: \EFI\ubuntu\shimx64.efi
+Status: 0xc000007b
+```
+- Booted into Windows and ran:
 
-### Next Steps
-- Recreate GRUB from within the installed Ubuntu environment (not Live USB).
-- Confirm EFI partition mount consistency.
-- Clean redundant Windows Boot Manager entries.
-- Finalize documentation for GitHub.
+```text
+bcdedit /enum firmware
+```
+- Found duplicate {Ubuntu} entries and missing canonical path references. 
+- Verified the external SSD contained:
 
----
+```text
+/EFI/ubuntu/
+```
+  but lacked complete GRUB files.
+- Checked disk layout using Disk Management in Windows to confirm partitions.
+- Confirmed Ubuntu's EFI partition existed but was not properly configured.
+- Additional inspection in PowerShell:
 
-## Notes
-This log will continue tracking configuration changes, GRUB reinstalls, and progress towards stable dual-boot functionality.
+```text
+Get-Disk | Select Number, FriendlyName, PartitionStyle
+```
+- Result showed external SSD:
 
+```text
+Partition 1 — EFI System (FAT32)
+Partition 2 — Ubuntu Root (EXT4)
+```
+- Compared GUIDs for EFI entries:
+
+```text
+bcdedit /enum firmware
+```
+- Output snippet:
+
+```text
+identifier              {bootmgr}
+device                  partition=\Device\HarddiskVolume1
+path                    \EFI\Microsoft\Boot\bootmgfw.efi
+
+identifier              {aad562f4-b409-11f0-9464-806e6f6e6963}
+device                  partition=S:
+description             UEFI: Seagate Game Drive PS4
+```
+
+### Observations
+
+Ubuntu EFI partition present but incomplete.  
+Firmware boot order defaulted to Windows Boot Manager.  
+Selecting the external drive manually still failed to load GRUB.  
+EFI folder structure suggested GRUB had been partially overwritten or unlinked.
+
+### Notes
+
+Prepared an Ubuntu Live USB installer to access a repair environment.
+Documented partition identifiers:
+```text
+/dev/sda2 → EFI Partition  
+/dev/sda3 → Ubuntu Root Partition
+```
+Planned to reinstall GRUB manually via terminal commands during day 2.
+Preliminary fix plan outline:
+
+```text
+sudo mount /dev/sda3 /mnt
+sudo mount /dev/sda2 /mnt/boot/efi
+sudo grub-install --target=x86_64-efi --efi-directory=/mnt/boot/efi --bootloader-id=Ubuntu
+update-grub
+```
