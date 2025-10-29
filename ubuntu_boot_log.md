@@ -85,3 +85,114 @@ sudo mount /dev/sda2 /mnt/boot/efi
 sudo grub-install --target=x86_64-efi --efi-directory=/mnt/boot/efi --bootloader-id=Ubuntu
 update-grub
 ```
+---
+
+## 🗓️ Day 2 — October 28, 2025
+### Objective
+Repair the GRUB bootloader on the external Ubuntu SSD and restore boot capability without affecting Windows 11.
+
+### Actions
+- Booted into **Ubuntu Live USB** to access the external SSD.
+- Verified disk and partition structure using:
+
+```text
+```bash
+sudo fdisk -l
+```
+- Output confirmed:
+
+```text
+/dev/sda1  →  Microsoft Reserved Partition  
+/dev/sda2  →  EFI System (1 GB)  
+/dev/sda3  →  Ubuntu Root (46 GB)  
+/dev/sda4  →  Extended Storage (1.7 TB)
+```
+- Mounted Ubuntu partitions:
+
+```text
+sudo mount /dev/sda3 /mnt
+sudo mount /dev/sda2 /mnt/boot/efi
+```
+- Attempted GRUB reinstall:
+
+```text
+sudo grub-install --target=x86_64-efi --efi-directory=/mnt/boot/efi --bootloader-id=Ubuntu_External --removable --recheck
+```
+
+- Initial error recieved:
+
+```text
+grub-install: error: failed to get canonical path of ‘/mnt/boot/efi’.
+```
+- Rechecked mount points and verified directories:
+
+```text
+ls /mnt/boot/efi
+lsblk
+```
+- Confirmed both partitions correctly mounted, then bound system directories for chroot:
+
+```text
+for i in /dev /dev/pts /proc /sys /run; do sudo mount -B $i /mnt$i; done
+sudo chroot /mnt
+```
+- Ran GRUB reinstall again:
+
+```text
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=Ubuntu_External --recheck --removable
+```
+- Error log:
+
+```text
+grub-install: error: failed to get canonical path of '/boot/efi'.
+```
+- Verified EFI contents manually:
+
+```text
+ls /boot/efi/EFI/
+```
+- Observed existing directories:
+
+```text
+Boot  Microsoft  Ubuntu
+```
+- Cross-checked firmware entries:
+
+```text
+sudo efibootmgr
+```
+- Output:
+
+```text
+Boot0000* Windows Boot Manager
+Boot0003* UEFI: Seagate Game Drive PS4
+Boot0005* UEFI: Ubuntu
+```
+At this stage, EFI entries existed but GRUB was not initializing from the external SSD.
+
+
+### Observations
+
+Ubuntu EFI partition correctly mounted but GRUB path resolution continued to fail.  
+`grub-install` could not locate the canonical mount directory even after binding /dev and /sys.  
+Both `Ubuntu` and `Ubuntu_External` entries appeared in UEFI firmware, but only the Windows boot entry functioned.
+
+### Notes
+
+Created a clean mount sequence and confirmed partition UUIDs matched 
+```text
+/etc/fstab
+```
+Considered wiping and rebuilding EFI folder manually but deferred until confirmation of GUID structure.
+
+Next step: clean up duplicate firmware entries and rebuild boot sequence.
+
+Planned Day 3 tasks:
+
+```text
+bcdedit /enum firmware
+bcdedit /delete {aad562f4-b409-11f0-9464-806e6f6e6963}
+bcdedit /set {bootmgr} displaybootmenu yes
+```
+Goal for Day 3: ensure Ubuntu boots independently from SSD and add to Windows Boot Manager menu.
+
